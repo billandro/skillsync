@@ -17,7 +17,7 @@ class User:
     def __str__(self):
         return f"{self.name}, {self.email}, {self.role}"
 
-tumiso = User("Tumiso", "example@gmail.com", "Software Engineer")
+
 def connect_to_database():
     cred = credentials.Certificate("skillsync-project-451208-firebase-adminsdk-fbsvc-247be52390.json")
     firebase_admin.admin(cred, {
@@ -35,10 +35,6 @@ def write_to_the_database(path):
     ref.set({
     })
 
-    # with open("example.json", "r") as f:
-    #     file_contents = json.load(f)
-    # ref.set(file_contents)
-
     
 def update_data():
     ref = db.reference('your_data_path')
@@ -46,15 +42,32 @@ def update_data():
         'age': 31
     })
 
+def authentic_user(name:str, email:str, password:int):
+    # name, email, role, password
+    user = auth.create_user(
+        display_name = name,
+        email = email,
+        password = password,
+    )
 
-user = auth.create_user(
-    email='user@example.com',
-    password='password',
-    display_name='John Doe',
-    photo_url='https://example.com/photo.jpg'
-)
-print(user.uid)
+    print(f"user ID: {user.uid}, password: {user.password}, name: {user.display_name}, email: {user.email}")
+    
+    # Prompt the user for a role
+    role = input("Are you signing up to be a MENOTOR or PEER?: ").strip()
+    user.uid = User(user.name, user.email, user.role, user.password)
+    
+    ref = db.reference(f"/Users/{user.uid}")
+    user_details = {
+        "name": user.name,
+        "email": user.email,
+        "role": role,
+        "password": user.password,
+    }
+    file_contents = json.load(user_details)
+    print(file_contents)
+    # ref.set()
 
+print(authentic_user("example", "example.gmail.com", 0000))
 # ref = db.reference("/Books/Best_Sellers/")
 # best_sellers = ref.get()
 # print(best_sellers)
@@ -62,3 +75,19 @@ print(user.uid)
 #     if(value["Author"] == "J.R.R. Tolkien"):
 #         value["Price"] = 90
 #         ref.child(key).update({"Price":80})
+
+
+# ref = db.reference("user")
+#     snapshot = ref.get()
+
+# with open("book_info.json", "r") as f:
+#         file_contents = json.load(f)
+#     ref.set(file_contents)
+
+
+def main():
+    # Connect to the databade first
+    connect_to_database()
+
+    #
+    
