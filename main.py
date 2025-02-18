@@ -4,9 +4,9 @@ from firebase_admin import auth
 import json
 
 
-# def read_from_database(path):
-#     ref = db.reference(path)
-#     snapshot = ref.get()
+def read_from_database(path):
+    ref = db.reference(path)
+    return ref.get()
 
 # def write_to_the_database(path):
 #     ref = db.reference(path)
@@ -29,21 +29,27 @@ def connect_to_database():
 
 def login():
     print("Log in...")
-    email = input("Enter email: ")
+    email = input("\nEnter email: ")
     password = input("Enter password: ")
-    guy = auth.get_user_by_email(email)
-    print(type(guy))
-    print(guy)
+
+    try:
+        guy = auth.get_user_by_email(email)
+        print(guy.uid)
+
+        print(read_from_database(f"/Users/{guy.uid}"))
+        print(type(read_from_database(f"/Users/{guy.uid}")))
+    except auth.UserNotFoundError:
+        print("Error: user does not exist")
     
 
 def sign_up():
-    print("Sign up.....")
-    email = input("Enter email: ").strip()
+    print("Sign up here.....")
+    email = input("\nEnter email: ").strip()
     password = input("Enter password: ").strip()
     first_name = input("Enter first name: ").strip()
      
     # Prompt the user for a role
-    role = input("Are you signing up to be a 'MENTOR' or 'PEER'?: ").strip().lower()
+    role = input("What role are you taking up?[mentor/peer'] ").strip().lower()
     expertise = input("What is your expertise?: ").strip().lower()
 
     try:
@@ -58,20 +64,16 @@ def authenticate_user(full_name:str, email:str, role:str, password:int, expertis
         email = email,
         password = password,
     )
-    print(f"user_id: {user.uid}, full_name: {user.display_name}, email: {user.email}, role: {role}, expertise: {expertise}")
     
-    # ref = db.reference(f"/Users/{user.uid}")
-    the_id = user.uid
-    the_user = {
+    ref = db.reference(f"/Users/{user.uid}")
+    user_data = {
         "full_name": full_name,
         "email": email,
         "role": role,
         "expertise": expertise,
     }
-
-    print(f"{user.uid}")
-    # file_contents = json.load(user.uid)
-    # print(type(file_contents))
+    print(f"{user_data}")
+    ref.set(user_data)
 
 
 def main():
@@ -88,21 +90,10 @@ def main():
 main()
 
 
-# print(authentic_user("example", "example.gmail.com", 0000))
 # ref = db.reference("/Books/Best_Sellers/")
 # best_sellers = ref.get()
-# print(best_sellers)
+
 # for key, value in best_sellers.items():
 #     if(value["Author"] == "J.R.R. Tolkien"):
 #         value["Price"] = 90
-#         ref.child(key).update({"Price":80})
-
-
-# ref = db.reference("user")
-#     snapshot = ref.get()
-
-# with open("book_info.json", "r") as f:
-#         file_contents = json.load(f)
-#     ref.set(file_contents)
-    
-    
+#         ref.child(key).update({"Price":80}) 
