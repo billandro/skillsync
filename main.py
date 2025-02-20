@@ -1,23 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, db
-from firebase_admin import auth
-import json
-
-
-def read_from_database(path):
-    ref = db.reference(path)
-    return ref.get()
-
-# def write_to_the_database(path):
-#     ref = db.reference(path)
-#     ref.set({
-#     })
-
-# def update_data():
-#     ref = db.reference('your_data_path')
-#     ref.update({
-#         'age': 31
-#     })
+from authentication import login, sign_up
 
 
 def connect_to_database():
@@ -25,55 +8,6 @@ def connect_to_database():
     firebase_admin.initialize_app(cred, {
         "databaseURL": "https://skillsync-project-451208-default-rtdb.firebaseio.com/"
     })
-
-
-def login():
-    print("Log in...")
-    email = input("\nEnter email: ")
-    password = input("Enter password: ")
-
-    try:
-        guy = auth.get_user_by_email(email)
-        print(guy.uid)
-
-        print(read_from_database(f"/Users/{guy.uid}"))
-        print(type(read_from_database(f"/Users/{guy.uid}")))
-    except auth.UserNotFoundError:
-        print("Error: user does not exist")
-    
-
-def sign_up():
-    print("Sign up here.....")
-    email = input("\nEnter email: ").strip()
-    password = input("Enter password: ").strip()
-    first_name = input("Enter first name: ").strip()
-     
-    # Prompt the user for a role
-    role = input("What role are you taking up?[mentor/peer'] ").strip().lower()
-    expertise = input("What is your expertise?: ").strip().lower()
-
-    try:
-        authenticate_user(first_name, email, role, password, expertise)
-    except auth.EmailAlreadyExistsError:
-        print("Error: email already exists")
-
-
-def authenticate_user(full_name:str, email:str, role:str, password:int, expertise:str):
-    user = auth.create_user(
-        display_name = full_name,
-        email = email,
-        password = password,
-    )
-    
-    ref = db.reference(f"/Users/{user.uid}")
-    user_data = {
-        "full_name": full_name,
-        "email": email,
-        "role": role,
-        "expertise": expertise,
-    }
-    print(f"{user_data}")
-    ref.set(user_data)
 
 
 def main():
@@ -87,13 +21,4 @@ def main():
         sign_up()
 
 
-main()
-
-
-# ref = db.reference("/Books/Best_Sellers/")
-# best_sellers = ref.get()
-
-# for key, value in best_sellers.items():
-#     if(value["Author"] == "J.R.R. Tolkien"):
-#         value["Price"] = 90
-#         ref.child(key).update({"Price":80}) 
+# main()
