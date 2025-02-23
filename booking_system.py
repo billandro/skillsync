@@ -2,7 +2,10 @@ from firebase_admin import auth, db
 from firebase_admin import credentials
 from main import connect_to_database
 from shared import read_from_database
+import click
 
+
+@click.command()
 def mentor_list():
     """Display available mentors"""
     connect_to_database()
@@ -16,11 +19,11 @@ def mentor_list():
 
     for i in range(len(mentor_list)):
         if i == 0:
-            print("List of available mentors....")
-        print(f"\nMentor {i + 1}:")
-        print(f"Name: {mentor_list[i]['first_name']}")
-        print(f"Email address: {mentor_list[i]['email']}")
-        print(f"Expertise: {mentor_list[i]['expertise']}")
+            click.echo("List of available mentors....")
+        click.echo(f"\nMentor {i + 1}:")
+        click.echo(f"Name: {mentor_list[i]['first_name']}")
+        click.echo(f"Email address: {mentor_list[i]['email']}")
+        click.echo(f"Expertise: {mentor_list[i]['expertise']}")
 
 
 def choose_mentor():
