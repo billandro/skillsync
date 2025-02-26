@@ -12,21 +12,24 @@ def cli():
 
 def create_user_in_firebase(first_name:str, email:str, role:str, password:int, expertise:str):
     """Handles user authentication based on returning status."""
-    user = auth.create_user(
-        display_name = first_name,
-        email = email,
-        password = password,
-    )
-    
-    ref = db.reference(f"/Users/{user.uid}")
-    user_data = {
-        "first_name": first_name,
-        "email": email,
-        "role": role,
-        "expertise": expertise,
-    }
+    try:
+        user = auth.create_user(
+            display_name = first_name,
+            email = email,
+            password = password,
+        )
+        
+        ref = db.reference(f"/Users/{user.uid}")
+        user_data = {
+            "first_name": first_name,
+            "email": email,
+            "role": role,
+            "expertise": expertise,
+        }
 
-    ref.set(user_data)
+        ref.set(user_data)
+    except auth.EmailAlreadyExistsError:
+        click.secho("Error: Email already exists", fg="red")
 
 
 @cli.command()
