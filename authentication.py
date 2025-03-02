@@ -1,6 +1,6 @@
 from firebase_admin import db
 from firebase_admin import auth
-from shared import read_from_database
+from shared import read_from_database, validate_not_empty
 import click
 
 
@@ -33,11 +33,12 @@ def create_user_in_firebase(first_name:str, email:str, role:str, password:int, e
 
 
 @cli.command()
-@click.option("--email", prompt="Enter your email")
-@click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
-def login(email, password):
+def login():
     """Handles user login"""
     click.echo("Logging in...")
+
+    email = click.option("--email", prompt="Enter your email")
+    password = click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
 
     try:
         user = auth.get_user_by_email(email)
@@ -48,20 +49,23 @@ def login(email, password):
     
 
 @cli.command()
-@click.option("--firstname", prompt="Enter first name")
-@click.option("--email", prompt="Enter your email")
-@click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
-@click.option("--role", prompt="What role are you taking up? [mentor/peer]")
-@click.option("--expertise", prompt="What is your expertise?")
-def sign_up(firstname, email, password, role, expertise):
+def sign_up():
     """Handles user sign-up"""
     click.echo("Signing up...")
+
+    firstname = click.option("--firstname", prompt="Enter first name")
+    email = click.option("--email", prompt="Enter your email")
+    password = click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
+    role = click.option("--role", prompt="What role are you taking up? [mentor/peer]")
+    expertise = click.option("--expertise", prompt="What is your expertise?")
 
     try:
         create_user_in_firebase(firstname, email, role, password, expertise)
         click.echo("Account created successfully!")
     except auth.EmailAlreadyExistsError:
         click.secho("Error: email already exists", fg="red")
+    except:
+        click.secho("Error signing up")
 
 
 if __name__ == "__main__":
