@@ -1,18 +1,18 @@
 from firebase_admin import db
-import click
+import click, string, random
 
 def read_from_database(path):
     ref = db.reference(path)
     return ref.get()
 
 
-def add_meeting_to_database(the_data, meeting_id):
+def add_meeting_to_database(the_data:object, meeting_id:str):
     ref = db.reference(f"/Meetings/{meeting_id}")
     ref.set(the_data)
 
 
-def add_workshop_requests_to_database(the_data, workshop_id):
-    ref = db.reference(f"/Meetings/{workshop_id}")
+def add_workshop_requests_to_database(the_data:object, workshop_id:str):
+    ref = db.reference(f"/Workshop Requests/{workshop_id}")
     ref.set(the_data)
 
 
@@ -22,7 +22,7 @@ def validate_not_empty(ctx, param, value):
     return value
 
 
-def list_mentors(mentors):
+def list_mentors(mentors:list):
     for i in range(len(mentors)):
         if i == 0:
             click.secho("Available mentors:", fg="blue")
@@ -40,14 +40,26 @@ def list_workshops():
     data = read_from_database("/Workshops")
     i = 0
     # If user is indeed signed in. List all upcoming workshops
-    if "session exists":
-        for k,v in data.items():
-            if i == 0:
-                click.secho(f"\nAvailable workshops:\n", fg="blue")
+    for k,v in data.items():
+        if i == 0:
+            click.secho(f"\nAvailable workshops:\n", fg="blue")
 
-            click.echo(f"Topic {i + 1} - {v['topic']}")
-            i += 1
+        click.echo(f"Topic {i + 1} - {v['topic']}")
+        i += 1
 
 
-def request_worksops():
-    data = read_from_database("/Workshops")
+def request_workshop(topic:str, id:str, date_requested:str):
+    """This function will create a workshop request instance.
+
+    It will also generate a unique random workshop id.
+    """
+    the_data = {
+        "requestor_id": id,
+        "topic": topic,
+        "date_requested": date_requested
+    }
+
+    characters = string.ascii_letters + string.digits
+    workshop_id = "".join(random.choice(characters) for _ in range(28))
+
+    add_workshop_requests_to_database(the_data, workshop_id)
