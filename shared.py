@@ -23,17 +23,22 @@ def validate_not_empty(ctx, param, value):
 
 
 def list_mentors(mentors:list):
-    for i in range(len(mentors)):
-        if i == 0:
-            click.secho("Available mentors:", fg="blue")
+    """Ensures that there are mentors to begin with. If not an error message is displayed."""
+    try:
+        for i in range(len(mentors)):
+            if i == 0:
+                click.secho("Available mentors:", fg="blue")
 
-        key, mentor_data = mentors[i]
+            key, mentor_data = mentors[i]
 
-        if mentor_data.get("role") == "mentor":
-            click.echo(f"\nMentor {i + 1}:")
-            click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
-            click.echo(f'Email: {mentor_data.get("email")}')
-            click.echo(f'Expertise: {mentor_data.get("expertise")}')
+            if mentor_data.get("role") == "mentor":
+                click.echo(f"\nMentor {i + 1}:")
+                click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
+                click.echo(f'Email: {mentor_data.get("email")}')
+                click.echo(f'Expertise: {mentor_data.get("expertise")}')
+    except Exception as e:
+        click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="gold", bg="white", blink=True)
+
 
 
 def list_workshops():
