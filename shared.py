@@ -37,15 +37,19 @@ def list_mentors(mentors:list):
 
 
 def list_workshops():
-    data = read_from_database("/Workshops")
+    data = read_from_database("/Workshops Requests")
     i = 0
-    # If user is indeed signed in. List all upcoming workshops
-    for k,v in data.items():
-        if i == 0:
-            click.secho(f"\nAvailable workshops:\n", fg="blue")
 
-        click.echo(f"Topic {i + 1} - {v['topic']}")
-        i += 1
+    try:
+        # If user is indeed signed in. List all upcoming workshops
+        for k,v in data.items():
+            if i == 0:
+                click.secho(f"\nUpcoming workshops:\n", fg="blue")
+
+            click.echo(f"Topic {i + 1} - {v['topic']}")
+            i += 1
+    except Exception as e:
+        click.secho(f"{e}: You have no upcoming workshops...", fg="gold", bg="white", blink=True)
 
 
 def request_workshop(topic:str, id:str, date_requested:str):
