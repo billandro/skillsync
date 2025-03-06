@@ -18,18 +18,21 @@ def create_user_in_firebase(first_name:str, email:str, role:str, password:int, e
             email = email,
             password = password,
         )
-        
-        ref = db.reference(f"/Users/{user.uid}")
-        user_data = {
-            "first_name": first_name,
-            "email": email,
-            "role": role,
-            "expertise": expertise,
-        }
 
-        ref.set(user_data)
-    except auth.EmailAlreadyExistsError:
-        click.secho("Error: Email already exists", fg="red")
+        try: 
+            ref = db.reference(f"/Users/{user.uid}")
+            user_data = {
+                "first_name": first_name,
+                "email": email,
+                "role": role,
+                "expertise": expertise,
+            }
+
+            ref.set(user_data)
+        except ValueError:
+            click.secho("The file path does not exist or the app is invalid...", fg="red")
+    except:
+        click.secho("Error: failed to create user...", fg="red")
 
 
 @cli.command()
