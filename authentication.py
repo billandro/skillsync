@@ -43,9 +43,13 @@ def login():
     try:
         user = auth.get_user_by_email(email)
         full_name = read_from_database(f"/Users/{user.uid}/first_name")
-        click.echo(f"\nWelcome, {full_name}. You have successfully signed in.")
+        click.secho(f"\nWelcome, {full_name}. You have successfully signed in.", bg="orange", underline=True)
+    except ValueError:
+        click.secho("Email was empty, none, or malformed....", fg="red", blink=True)
     except auth.UserNotFoundError:
-        click.secho("Error: user does not exist", fg="red")
+        click.secho("Error: user does not exist....", fg="red", bold=True)
+    except:
+        click.secho("Error while retrieving user from firebase....", fg="red")
     
 
 @cli.command()
