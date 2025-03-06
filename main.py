@@ -106,9 +106,10 @@ def request_a_workshop():
     from shared import request_workshop
     global session, user_uid
 
-    topic = click.prompt("What topic would you like covered in this workshop?", type=str)
-    date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
     if session is not None and user_uid is not None:
+        topic = click.prompt("What topic would you like covered in this workshop?", type=str)
+        date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
+        
         request_workshop(topic, user_uid, date_requested)
     else:
         click.secho("Please sign in to request a workshop...", fg="orange", blink=True)
