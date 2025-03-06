@@ -11,6 +11,11 @@ def add_meeting_to_database(the_data, meeting_id):
     ref.set(the_data)
 
 
+def add_workshop_requests_to_database(the_data, workshop_id):
+    ref = db.reference(f"/Meetings/{workshop_id}")
+    ref.set(the_data)
+
+
 def validate_not_empty(ctx, param, value):
     if not value:
         raise click.BadParameter("Input cannot be empty")
@@ -42,3 +47,7 @@ def list_workshops():
 
             click.echo(f"Topic {i + 1} - {v['topic']}")
             i += 1
+
+
+def request_worksops():
+    data = read_from_database("/Workshops")
