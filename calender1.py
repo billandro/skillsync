@@ -49,7 +49,7 @@ def create_calender_event(email1, email2, summary, event_date, start_time, end_t
         ],
         'attendees': [
             {'email': user["email"]},
-            {'email': email2.email}
+            {'email': email2}
         ],
         'reminders': {
             'useDefault': False,
@@ -61,4 +61,6 @@ def create_calender_event(email1, email2, summary, event_date, start_time, end_t
     }
 
     event = service.events().insert(calendarId='primary', body=event).execute()
-    click.echo('Event created: %s' % (event.get('htmlLink')))
+    click.echo(f"Event created: {event.get('htmlLink')}")
+
+    return event["id"]
