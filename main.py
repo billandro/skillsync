@@ -12,18 +12,6 @@ def main():
     connect_to_database()
 
 
-@main.command(name="authenticate_user")
-def authenticate():
-    """Handles user authentication based on returning status."""
-    global user_uid
-
-    returning_user = click.prompt("Are you a returning user?", type=click.Choice(["y", "n"], case_sensitive=True))
-    if returning_user == "y":
-        user_uid = login()
-    else:
-        user_uid = sign_up()
-
-
 def create_session():
     """Create session cookie and id token for authenticated user"""
     global session
@@ -44,15 +32,19 @@ def create_session():
             return
 
 
-@main.command(name="end_session")
-def end_session():
-    """Ends the session cookie or signs out the authenticated user"""
-    global session, user_uid
-    session = None
-    user_uid = None
+@main.command(name="Login")
+def authenticate():
+    """Handles user authentication based on returning status."""
+    global user_uid
+
+    returning_user = click.prompt("Are you a returning user?", type=click.Choice(["y", "n"], case_sensitive=True))
+    if returning_user == "y":
+        user_uid = login()
+    else:
+        user_uid = sign_up()
 
 
-@main.command(name="view_workshops")
+@main.command(name="View Workshops")
 def view_workshops():
     """Lists upcoming workshops and mentors available for booking.
     
@@ -75,7 +67,7 @@ def view_workshops():
         click.secho("Please sign in to view workshops...", fg="orange", blink=True)
 
 
-@main.command(name="request_session")
+@main.command(name="Request Meeting")
 def request_session():
     """Requests a meeting with a mentor.
     
@@ -89,6 +81,14 @@ def request_session():
         request_meeting(user.email)
     else:
         click.secho("Please sign in to request a session...", fg="orange", blink=True)
+
+
+@main.command(name="Sign Out")
+def end_session():
+    """Ends the session cookie or signs out the authenticated user"""
+    global session, user_uid
+    session = None
+    user_uid = None
 
 
 if __name__ == "__main__":
