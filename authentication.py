@@ -4,12 +4,6 @@ from shared import read_from_database, validate_not_empty
 import click
 
 
-@click.group()
-def cli():
-    """User authentication commands"""
-    pass
-
-
 def create_user_in_firebase(first_name:str, email:str, role:str, password:int, expertise:str):
     """Handles user authentication based on returning status."""
     try:
@@ -35,13 +29,12 @@ def create_user_in_firebase(first_name:str, email:str, role:str, password:int, e
         click.secho("Error: failed to create user...", fg="red")
 
 
-@cli.command()
 def login():
     """Handles user login"""
-    click.echo("Logging in...")
+    click.secho("Logging in...", fg="orange")
 
-    email = click.option("--email", prompt="Enter your email")
-    password = click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
+    email = click.prompt("Enter your email")
+    password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
 
     try:
         user = auth.get_user_by_email(email)
@@ -57,16 +50,16 @@ def login():
         click.secho("Error while retrieving user from firebase....", fg="red")
     
 
-@cli.command()
+# @cli.command()
 def sign_up():
     """Handles user sign-up"""
     click.secho("Signing up...", blink=True, fg="orange")
 
-    firstname = click.option("--firstname", prompt="Enter first name")
-    email = click.option("--email", prompt="Enter your email")
-    password = click.option("--password", prompt="Enter your password", hide_input=True, confirmation_prompt=True)
-    role = click.option("--role", prompt="What role are you taking up? [mentor/peer]")
-    expertise = click.option("--expertise", prompt="What is your expertise?")
+    firstname = click.prompt("Enter first name")
+    email = click.prompt("Enter your email")
+    password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
+    role = click.prompt("What role are you taking up?", type=click.Choice(["mentor","peer"], case_sensitive=True))
+    expertise = click.prompt("What is your expertise?")
 
     try:
         user_id = create_user_in_firebase(firstname, email, role, password, expertise)
@@ -77,7 +70,3 @@ def sign_up():
         click.secho("Error: email already exists", fg="red")
     except:
         click.secho("Error signing up")
-
-
-if __name__ == "__main__":
-    cli()
