@@ -83,6 +83,37 @@ def request_session():
         click.secho("Please sign in to request a session...", fg="orange", blink=True)
 
 
+@main.command(name="View Bookings")
+def view_bookings():
+    """Displays a list of confirmed bookings.
+
+    This function requires user authentication and session creation.
+    """
+    global session, user_uid
+
+    if session is not None and user_uid is not None:
+        pass
+    else:
+        click.secho("Please sign in to view bookings...", fg="orange", blink=True)
+
+
+@main.command(name="Request Workshop")
+def request_a_workshop():
+    """ Request a workshop from users
+
+    This function requires user authentication and session creation.
+    """
+    from shared import request_workshop
+    global session, user_uid
+
+    topic = click.prompt("What topic would you like covered in this workshop?", type=str)
+    date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
+    if session is not None and user_uid is not None:
+        request_workshop(topic, user_uid, date_requested)
+    else:
+        click.secho("Please sign in to request a workshop...", fg="orange", blink=True)
+
+
 @main.command(name="Sign Out")
 def end_session():
     """Ends the session cookie or signs out the authenticated user"""
