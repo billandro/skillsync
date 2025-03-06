@@ -1,21 +1,13 @@
 import datetime, click
 
 from calender1 import create_calender_event
-from firebase_admin import auth, db
-from firebase_admin import credentials
-from main import connect_to_database
-from shared import read_from_database, add_to_database, validate_not_empty
+from firebase_admin import auth
+from shared import read_from_database, add_meeting_to_database
+from shared import list_mentors
 
 
-@click.group()
-def cli_2():
-    """This is the grouper of all the commands"""
-    pass
-
-
-def get_peers_and_peers():
+def get_mentors_and_peers():
     """Display available peers"""
-    connect_to_database()
 
     mentor_list = []
     peer_list = []
@@ -32,40 +24,41 @@ def get_peers_and_peers():
 
 def book_mentor(mentors, chosen_mentors, user, done):
     """This will allow the user the opportunity to book one or more mentor sessions"""
-    summary = f"This will be a mentor session. The session is on {user.expertise}."
 
     while not done:
-        chosen_mentor = click.option(prompt="Enter the mentor you would like to book by name (e.g. 'Bill')", value_proc=validate_not_empty).strip().lower()
+        chosen_mentor = click.prompt("Enter the mentor you would like to book by name (e.g. 'Bill')").strip().lower()
         
         for i in range(len(mentors)):
-            for key, value in mentors[i][1].items():
-                if chosen_mentor == value["first_name"]:
-                    chosen_mentors.append(key)
+            mentor_id, mentor_data = mentors[i]
+            for key, value in mentor_data.items():
+                if chosen_mentor == value.get("first_name") or value.get("full_name"):
+                    chosen_mentors.append(mentor_id)
 
                     event_date = click.prompt("Enter a date for session e.g. 2016-02-18").strip()
                     if not booking_date(event_date):
-                        click.secho("Error: The date you chose in during the weekend!", fg="red")
+                        click.secho("Error: The date you chose is during the weekend. Booking failed!", fg="red", bg="white", bold=True)
                         return
                     
                     start_time = click.prompt("Enter session start time ['07:00-16:59']")
                     end_time = click.prompt("Enter session endtime ['07:01-17:00']")
                     if not booking_time(start_time, end_time):
-                        click.secho("Error: The time you chose is not during business hours (07:00-17:00)!", fg="red")
+                        click.secho("Error: The time you chose is not during business hours (07:00-17:00). Booking failed!", fg="red", bg="white", bold=True)
                         return
                     
-                    meeting_id = {"mentor_id": key, "mentee_id": user.uid, "time": f"{start_time}-{end_time}", "status": "active"}
-                    add_to_database(meeting_id, key)
-                    create_calender_event(user.email, value["email"], summary, event_date, start_time, end_time)
-                    return
+                    meeting_id = {"mentor_id": mentor_id, "mentee_id": user.uid, "time": f"{start_time}-{end_time}", "status": "active"}
+                    summary = f"This will be a mentor session. The session is on {value.get("expertise")}."
+                    the_id = create_calender_event(user.email, value.get("email"), summary, event_date, start_time, end_time)
+                    add_meeting_to_database(meeting_id, the_id)
+                    
 
-        click.secho(f"Chosen mentor, '{chosen_mentor}', is not in our system.", fg="red")
+        click.secho(f"Chosen mentor, '{chosen_mentor}', is NOT in our system.", fg="red")
 
         select_again = click.confirm("Would you like to book another mentor?")
-        if select_again == "y":
+        if select_again:
             done = False
             continue
         else:
-            click.echo("Booking completed successfully...")
+            click.secho("Booking completed successfully...", fg="green")
             done = True
 
 
@@ -76,30 +69,29 @@ def booking_date(the_date):
 
 
 def booking_time(start_time, end_time):
-    """Function to check if time is during business hours"""
+    """This function will check whether the requested time is during business hours"""
     business_start = datetime.datetime.strptime("07:00", "%H:%M")
     business_end = datetime.datetime.strptime("17:00", "%H:%M")
 
-    return business_start <= start_time < business_end and business_start < end_time <= business_end
+    start_time_dt = datetime.datetime.strptime(start_time, "%H:%M")
+    end_time_dt = datetime.datetime.strptime(end_time, "%H:%M")
+
+    return business_start <= start_time_dt < business_end and business_start < end_time_dt <= business_end
         
 
-@cli_2.command()
 def request_meeting(email):
     """Book mentor/peers for session"""
 
-    mentors, peers = get_peers_and_peers()
+    mentors, peers = get_mentors_and_peers()
     done = False
     chosen_mentors = []
     chosen_peers = []
     user = auth.get_user_by_email(email)
 
-    booking = click.prompt("Would you like to book a mentor or peer session? ['peer'/'mentor']", type=click.Choice(["peer", "mentor"], case_sensitive=False))
+    booking = click.prompt("Would you like to book a mentor or peer session?", type=click.Choice(["peer", "mentor"], case_sensitive=True)).strip()
 
     if booking == "mentor":
+        list_mentors(mentors)
         book_mentor(mentors, chosen_mentors, user, done)
     else:
         pass
-
-
-if __name__ == "__main__":
-    cli_2()
