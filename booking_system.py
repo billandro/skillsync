@@ -23,43 +23,57 @@ def get_mentors_and_peers():
 
 
 def book_mentor(mentors, chosen_mentors, user, done):
-    """This will allow the user the opportunity to book one or more mentor sessions"""
-
+    """This will allow the user the opportunity to book one or more mentor sessions
+    
+    Will also handle any errors if no mentors are available.
+    """
     while not done:
         chosen_mentor = click.prompt("Enter the mentor you would like to book by name (e.g. 'Bill')").strip().lower()
         
-        for i in range(len(mentors)):
-            mentor_id, mentor_data = mentors[i]
-            for key, value in mentor_data.items():
-                if chosen_mentor == value.get("first_name") or value.get("full_name"):
-                    chosen_mentors.append(mentor_id)
+        found = False
+        try:
+            for i in range(len(mentors)):
+                mentor_id, mentor_data = mentors[i]
+                for key, value in mentor_data.items():
+                    if chosen_mentor == value.get("first_name", "").lower() or chosen_mentor == value.get("full_name", "").lower():
+                        found = True
+                        chosen_mentors.append(mentor_id)
 
-                    event_date = click.prompt("Enter a date for session e.g. 2016-02-18").strip()
-                    if not booking_date(event_date):
-                        click.secho("Error: The date you chose is during the weekend. Booking failed!", fg="red", bg="white", bold=True)
-                        return
-                    
-                    start_time = click.prompt("Enter session start time ['07:00-16:59']")
-                    end_time = click.prompt("Enter session endtime ['07:01-17:00']")
-                    if not booking_time(start_time, end_time):
-                        click.secho("Error: The time you chose is not during business hours (07:00-17:00). Booking failed!", fg="red", bg="white", bold=True)
-                        return
-                    
-                    meeting_id = {"mentor_id": mentor_id, "mentee_id": user.uid, "time": f"{start_time}-{end_time}", "status": "active"}
-                    summary = f"This will be a mentor session. The session is on {value.get("expertise")}."
-                    the_id = create_calender_event(user.email, value.get("email"), summary, event_date, start_time, end_time)
-                    add_meeting_to_database(meeting_id, the_id)
-                    
+                        event_date = click.prompt("Enter a date for session e.g. 2016-02-18").strip()
+                        if not booking_date(event_date):
+                            click.secho("Error: The date you chose is during the weekend. Booking failed!", fg="red", bg="white", bold=True)
+                            return
+                        
+                        start_time = click.prompt("Enter session start time ['07:00-16:59']")
+                        end_time = click.prompt("Enter session end time ['07:01-17:00']")
+                        if not booking_time(start_time, end_time):
+                            click.secho("Error: The time you chose is not during business hours (07:00-17:00). Booking failed!", fg="red", bg="white", bold=True)
+                            return
+                        
+                        meeting_id = {
+                            "mentor_id": mentor_id,
+                            "mentee_id": user.uid,
+                            "time": f"{start_time}-{end_time}",
+                            "status": "active"
+                        }
 
-        click.secho(f"Chosen mentor, '{chosen_mentor}', is NOT in our system.", fg="red")
+                        summary = f"This will be a mentor session. The session is on {value.get('expertise')}."
+                        the_id = create_calender_event(user.email, value.get("email"), summary, event_date, start_time, end_time)
+                        add_meeting_to_database(meeting_id, the_id)
 
-        select_again = click.confirm("Would you like to book another mentor?")
-        if select_again:
-            done = False
-            continue
-        else:
-            click.secho("Booking completed successfully...", fg="green")
-            done = True
+            if not found:
+                click.secho(f"Chosen mentor, '{chosen_mentor}', is NOT in our system.", fg="red")
+
+            select_again = click.confirm("Would you like to book another mentor?")
+            if select_again:
+                done = False
+                continue
+            else:
+                click.secho("Booking completed successfully...", fg="green")
+                done = True
+                
+        except Exception as e:
+            click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="gold", bg="white", blink=True)
 
 
 def booking_date(the_date):
