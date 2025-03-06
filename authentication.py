@@ -47,6 +47,8 @@ def login():
         user = auth.get_user_by_email(email)
         full_name = read_from_database(f"/Users/{user.uid}/first_name")
         click.secho(f"\nWelcome, {full_name}. You have successfully signed in.", bg="orange", underline=True)
+
+        return user.uid
     except ValueError:
         click.secho("Email was empty, none, or malformed....", fg="red", blink=True)
     except auth.UserNotFoundError:
@@ -58,7 +60,7 @@ def login():
 @cli.command()
 def sign_up():
     """Handles user sign-up"""
-    click.echo("Signing up...")
+    click.secho("Signing up...", blink=True, fg="orange")
 
     firstname = click.option("--firstname", prompt="Enter first name")
     email = click.option("--email", prompt="Enter your email")
@@ -67,8 +69,10 @@ def sign_up():
     expertise = click.option("--expertise", prompt="What is your expertise?")
 
     try:
-        create_user_in_firebase(firstname, email, role, password, expertise)
-        click.echo("Account created successfully!")
+        user_id = create_user_in_firebase(firstname, email, role, password, expertise)
+        click.secho("Account created successfully!", fg="green")
+
+        return user_id
     except auth.EmailAlreadyExistsError:
         click.secho("Error: email already exists", fg="red")
     except:
