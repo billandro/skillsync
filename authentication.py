@@ -31,7 +31,7 @@ def create_user_in_firebase(first_name:str, email:str, role:str, password:int, e
 
 def login():
     """Handles user login"""
-    click.secho("Logging in...", fg="orange")
+    click.secho("Logging in...", fg="yellow")
 
     email = click.prompt("Enter your email")
     password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
@@ -39,7 +39,7 @@ def login():
     try:
         user = auth.get_user_by_email(email)
         full_name = read_from_database(f"/Users/{user.uid}/first_name")
-        click.secho(f"\nWelcome, {full_name}. You have successfully signed in.", bg="orange", underline=True)
+        click.secho(f"\nWelcome, {full_name}. You have successfully signed in.", bg="yellow", underline=True)
 
         return user.uid
     except ValueError:
@@ -53,7 +53,7 @@ def login():
 # @cli.command()
 def sign_up():
     """Handles user sign-up"""
-    click.secho("Signing up...", blink=True, fg="orange")
+    click.secho("Signing up...", blink=True, fg="yellow")
 
     firstname = click.prompt("Enter first name")
     email = click.prompt("Enter your email")
