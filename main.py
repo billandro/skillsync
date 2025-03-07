@@ -89,12 +89,13 @@ def view_bookings():
 
     This function requires user authentication and session creation.
     """
+    from shared import view_user_confirmed_bookings
     global session, user_uid
 
     if session is not None and user_uid is not None:
-        pass
+        view_user_confirmed_bookings(user_uid)
     else:
-        click.secho("Please sign in to view bookings...", fg="orange", blink=True)
+        click.secho("Please sign in to view your bookings...", fg="orange", blink=True)
 
 
 @main.command(name="Request Workshop")
