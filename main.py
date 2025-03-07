@@ -107,6 +107,7 @@ def request_a_workshop():
     from shared import request_workshop
     global session, user_uid
 
+    create_session()
     if session is not None and user_uid is not None:
         topic = click.prompt("What topic would you like covered in this workshop?", type=str)
         date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
@@ -121,9 +122,14 @@ def end_session():
     """Ends the session cookie or signs out the authenticated user"""
     global session, user_uid
 
-    session = None
-    user_uid = None
-    click.secho("You have signed out. Goodbye.", fg="magenta", bg="white")
+    if session is not None and user_uid is not None:
+        session = None
+        user_uid = None
+
+        name = auth.get_user(uid=user_uid)
+        click.secho(f"You have signed out {name.get('full_name') or name.get('first_name')}. Goodbye.", fg="magenta", bg="white")
+    else:
+        click.secho("You can't sign out if you were never signed in silly.", fg="magenta", bg="white")
 
 
 if __name__ == "__main__":
