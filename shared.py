@@ -86,7 +86,7 @@ def view_user_confirmed_bookings(user_uid):
         # Checks for confirmed meetings. For mentoring, being mentored, 
         # and peer sessions.
         for meeting_id, value in meetings_data.items():
-            if value["mentor_id"] == user_uid:
+            if value["mentor_id"] == user_uid and value["status"] == "confirmed":
                 if i == 0:
                     click.echo("Your confirmed bookings:")
 
@@ -97,7 +97,7 @@ def view_user_confirmed_bookings(user_uid):
                 i += 1
                 continue
 
-            if  value["mentee_id"] == user_uid:
+            if  value["mentee_id"] == user_uid and value["status"] == "confirmed":
                 if i == 0:
                     click.echo("Your confirmed bookings:")
 
@@ -108,7 +108,7 @@ def view_user_confirmed_bookings(user_uid):
                 i += 1
                 continue
 
-            if  value["peer_id"] == user_uid:
+            if  value["peer_id"] == user_uid and value["status"] == "confirmed":
                 if i == 0:
                     click.echo("Your confirmed bookings:")
 
