@@ -76,6 +76,7 @@ def request_session():
     from booking_system import request_meeting
     global session, user_uid
     
+    create_session()
     if session is not None and user_uid is not None:
         user = auth.get_user(uid=user_uid)
         request_meeting(user.email)
@@ -92,6 +93,7 @@ def view_bookings():
     from shared import view_user_confirmed_bookings
     global session, user_uid
 
+    create_session()
     if session is not None and user_uid is not None:
         view_user_confirmed_bookings(user_uid)
     else:
