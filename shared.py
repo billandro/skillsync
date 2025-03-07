@@ -37,7 +37,7 @@ def list_mentors(mentors:list):
                 click.echo(f'Email: {mentor_data.get("email")}')
                 click.echo(f'Expertise: {mentor_data.get("expertise")}')
     except Exception as e:
-        click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="gold", bg="white", blink=True)
+        click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="black", bg="white", blink=True)
 
 
 def list_workshops():
@@ -53,7 +53,7 @@ def list_workshops():
             click.echo(f"Topic {i + 1} - {v['topic']}")
             i += 1
     except Exception as e:
-        click.secho(f"{e}: You have no upcoming workshops...", fg="gold", bg="white", blink=True)
+        click.secho(f"{e}: You have no upcoming workshops...", fg="black", bg="white", blink=True)
 
 
 def request_workshop(topic:str, id:str, date_requested:str):
@@ -120,7 +120,7 @@ def view_user_confirmed_bookings(user_uid):
                 continue
 
         if not confirmed_booking:
-            click.secho("You have no confirmed bookings.", fg="magneta", underline=True)
+            click.secho("You have no confirmed bookings.", fg="magenta", underline=True)
 
     except Exception as e:
         click.secho(f"{e}: Unfortunately, there are no scheduled meetings in the system.", fg="red")
