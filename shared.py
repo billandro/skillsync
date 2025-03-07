@@ -1,4 +1,4 @@
-from firebase_admin import db
+from firebase_admin import db, auth
 import click, string, random
 
 def read_from_database(path):
@@ -40,7 +40,6 @@ def list_mentors(mentors:list):
         click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="gold", bg="white", blink=True)
 
 
-
 def list_workshops():
     data = read_from_database("/Workshops Requests")
     i = 0
@@ -72,3 +71,57 @@ def request_workshop(topic:str, id:str, date_requested:str):
     workshop_id = "".join(random.choice(characters) for _ in range(28))
 
     add_workshop_requests_to_database(the_data, workshop_id)
+
+
+def view_user_confirmed_bookings(user_uid):
+    """This function first checks if there are any meetings in the database.
+    If there are, it will check if the user has any. If not, it will
+    alert the user.
+    """
+    meetings_data = read_from_database("/Meetings")
+    i = 0
+
+    try:
+        confirmed_booking = False
+        # Checks for confirmed meetings. For mentoring, being mentored, 
+        # and peer sessions.
+        for meeting_id, value in meetings_data.items():
+            if value["mentor_id"] == user_uid:
+                if i == 0:
+                    click.echo("Your confirmed bookings:")
+
+                click.echo(f"\nBooking {i + 1}:")
+                user = auth.get_user(value["mentee_id"])
+                click.echo(f"Mentoring session with {user.get('full_name') or user.get('first_name')}")
+                confirmed_booking = True
+                i += 1
+                continue
+
+            if  value["mentee_id"] == user_uid:
+                if i == 0:
+                    click.echo("Your confirmed bookings:")
+
+                click.echo(f"\nBooking {i + 1}:")
+                user = auth.get_user(value["mentor_id"])
+                click.echo(f"Mentor session with {user.get('full_name') or user.get('first_name')}")
+                confirmed_booking = True
+                i += 1
+                continue
+
+            if  value["peer_id"] == user_uid:
+                if i == 0:
+                    click.echo("Your confirmed bookings:")
+
+                click.echo(f"\nBooking {i + 1}:")
+                user = auth.get_user(value["mentor_id"])
+                click.echo(f"Peer session with {user.get('full_name') or user.get('first_name')}")
+                confirmed_booking = True
+                i += 1
+                continue
+
+        if not confirmed_booking:
+            click.secho("You have no confirmed bookings.", fg="magneta", underline=True)
+
+    except Exception as e:
+        click.secho(f"{e}: Unfortunately, there are no scheduled meetings in the system.", fg="red")
+            
