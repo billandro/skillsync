@@ -64,7 +64,7 @@ def view_workshops():
         list_mentors(mentors)
         list_workshops()
     else:
-        click.secho("Please sign in to view workshops...", fg="orange", blink=True)
+        click.secho("Please sign in to view workshops...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Meeting")
@@ -80,7 +80,7 @@ def request_session():
         user = auth.get_user(uid=user_uid)
         request_meeting(user.email)
     else:
-        click.secho("Please sign in to request a session...", fg="orange", blink=True)
+        click.secho("Please sign in to request a session...", fg="yellow", blink=True)
 
 
 @main.command(name="View Bookings")
@@ -95,7 +95,7 @@ def view_bookings():
     if session is not None and user_uid is not None:
         view_user_confirmed_bookings(user_uid)
     else:
-        click.secho("Please sign in to view your bookings...", fg="orange", blink=True)
+        click.secho("Please sign in to view your bookings...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Workshop")
@@ -113,7 +113,7 @@ def request_a_workshop():
         
         request_workshop(topic, user_uid, date_requested)
     else:
-        click.secho("Please sign in to request a workshop...", fg="orange", blink=True)
+        click.secho("Please sign in to request a workshop...", fg="yellow", blink=True)
 
 
 @main.command(name="Sign Out")
