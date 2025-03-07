@@ -120,8 +120,10 @@ def request_a_workshop():
 def end_session():
     """Ends the session cookie or signs out the authenticated user"""
     global session, user_uid
+
     session = None
     user_uid = None
+    click.secho("You have signed out. Goodbye.", fg="magenta", bg="white")
 
 
 if __name__ == "__main__":
