@@ -1,7 +1,7 @@
 from firebase_admin import db
-from firebase_admin import auth
+import firebase_admin.auth as auth
 from shared import read_from_database, validate_not_empty
-import click
+import click, requests
 
 
 def create_user_in_firebase(first_name:str, email:str, role:str, password:int, expertise:str):
@@ -36,18 +36,30 @@ def login():
     email = click.prompt("Enter your email")
     password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
 
-    try:
-        user = auth.get_user_by_email(email)
-        full_name = read_from_database(f"/Users/{user.uid}/first_name")
-        click.secho(f"\nWelcome, {full_name}. You have successfully signed in.", bg="yellow", underline=True)
+    api_key = "AIzaSyDvWCvCBT37F2nttDjfddsAE3Wo-Sh4sd8"  # 🔹 Replace with your Firebase project's Web API Key
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}"
+    
+    payload = {
+        "email": email,
+        "password": password,
+        "returnSecureToken": True
+    }
 
-        return user.uid
-    except ValueError:
-        click.secho("Email was empty, none, or malformed....", fg="red", blink=True)
-    except auth.UserNotFoundError:
-        click.secho("Error: user does not exist....", fg="red", bold=True)
-    except:
-        click.secho("Error while retrieving user from firebase....", fg="red")
+    try:
+        response = requests.post(url, json=payload)
+        response_data = response.json()
+
+        if "idToken" in response_data:
+            click.secho(f"\nWelcome! You have successfully signed in.", bg="yellow", underline=True)
+            return response_data["idToken"]  # ✅ Return the valid ID token
+
+        else:
+            click.secho(f"Error: {response_data.get('error', {}).get('message', 'Unknown error')}", fg="red", bold=True)
+            return None
+
+    except requests.RequestException as e:
+        click.secho(f"Error while retrieving user from Firebase: {e}", fg="red")
+        return None
     
 
 # @cli.command()
