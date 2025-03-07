@@ -54,7 +54,7 @@ def book_mentor(mentors, chosen_mentors, user, done):
                             "mentor_id": mentor_id,
                             "mentee_id": user.uid,
                             "time": f"{start_time}-{end_time}",
-                            "status": "active"
+                            "status": "confirmed"
                         }
 
                         summary = f"This will be a mentor session. The session is on {value.get('expertise')}."
