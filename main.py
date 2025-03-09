@@ -2,35 +2,32 @@ import click
 from authentication import login, sign_up
 from database import connect_to_database
 from firebase_admin import auth
+from shared import save_session, load_session
 
-# user_uid = None
-# session = None
 
 @click.group()
 @click.pass_context
 def main(ctx):
     """Main entry point for the CLI"""
     connect_to_database()
-    ctx.obj = {"session": None, "id_token": None}
+    ctx.obj = load_session("session.file") or {}
 
 
 def create_session(ctx):
     """Create session cookie and id token for authenticated user"""
-    # global session
+    if not ctx.obj.get("id_token"):
+        click.secho("Error: No ID token found. Cannot create session.", fg="red", blink=True)
+        return
 
-    if ctx.obj["session"] is None:
-        try:
-            id_token = ctx.obj["id_token"]  # Retrieve ID token from context
-
-            if not id_token:
-                click.secho("Error: No ID token found. Cannot create session.", fg="red", blink=True)
-                return
-
-            ctx.obj["session"] = auth.create_session_cookie(id_token=id_token, expires_in=3600)
-        except auth.InvalidIdTokenError:
-            click.secho("The provided ID token is invalid.", fg="red", blink=True)
-        except Exception as e:
-            click.secho(f"Unexpected error occurred while creating session cookie: {e}", fg="red", blink=True)
+    try:
+        auth.verify_id_token(ctx.obj["id_token"])
+        ctx.obj["session"] = auth.create_session_cookie(id_token=ctx.obj["id_token"], expires_in=3600)
+        save_session(ctx.obj, "session.json")
+        click.secho("Session created successfully!", fg="green")
+    except auth.InvalidIdTokenError:
+        click.secho("The provided ID token is invalid.", fg="red", blink=True)
+    except Exception as e:
+        click.secho(f"Unexpected error occurred while creating session: {e}", fg="red", blink=True)
 
 
 @main.command(name="Login")
@@ -38,14 +35,16 @@ def create_session(ctx):
 def authenticate(ctx):
     """Handles user authentication based on returning status."""
     returning_user = click.prompt("Are you a returning user?", type=click.Choice(["y", "n"], case_sensitive=True))
-
+    
     if returning_user == "y":
-        ctx.obj["id_token"] = login()  # Store the correct ID token
+        ctx.obj["id_token"] = login()
     else:
-        ctx.obj["id_token"] = sign_up()  # Store the correct ID token
+        ctx.obj["id_token"] = sign_up()
 
     create_session(ctx)
-    click.echo(f"Context Object after login: {ctx.obj}")
+    save_session(ctx.obj, "session.json")
+    click.secho("Session saved successfully!", fg="green")
+    click.echo(f"Context object after login: {ctx.obj}")
 
 
 @main.command(name="View Workshops")
@@ -127,18 +126,20 @@ def request_a_workshop():
 @click.pass_context
 def end_session(ctx):
     """Ends the session cookie or signs out the authenticated user"""
-    # global session, user_uid
+    ctx.obj = load_session("session.json")
 
-    click.echo(f"{ctx.obj}")
-    if ctx.obj["user_uid"] is not None:
-        # Fetch user details before resetting user_uid
-        user = auth.get_user(uid=ctx.obj["user_uid"])
-        ctx.obj["session"] = None
-        ctx.obj["user_uid"] = None
+    if not ctx.obj.get("session"):
+        click.secho("You can't sign out if you were never signed in, silly.", fg="magenta")
+        return
 
-        click.secho(f"You have signed out {user.display_name or user.email}. Goodbye.", fg="magenta", bg="white")
-    else:
-        click.secho("You can't sign out if you were never signed in silly.", fg="magenta", bg="white")
+    try:
+        decoded_token = auth.verify_session_cookie(ctx.obj["session"])
+        user = auth.get_user(decoded_token["uid"])
+        ctx.obj = {"session": None, "id_token": None}  # Clear session
+        click.secho(f"Signed out {user.display_name or user.email}. Goodbye!", fg="magenta")
+    except auth.InvalidSessionCookieError:
+        click.secho("Session is already invalid or expired.", fg="red")
+    save_session(ctx.obj, "session.json")  # Persist cleared session
 
 
 if __name__ == "__main__":
