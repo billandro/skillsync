@@ -75,12 +75,11 @@ def request_session():
     This function requires user authentication and session creation.
     """
     from booking_system import request_meeting
-    global session, user_uid
     
-    create_session()
-    if session is not None and user_uid is not None:
-        user = auth.get_user(uid=user_uid)
-        request_meeting(user.email)
+    data = load_session("session.json")
+    if data["session"] and data["uid"]:
+        user = auth.get_user(uid=data["uid"])
+        request_meeting(user.get("email"))
     else:
         click.secho("You must sign in to request a session...", fg="yellow", blink=True)
 
@@ -97,7 +96,7 @@ def view_bookings():
     if data["session"] and data["id_token"]:
         view_user_confirmed_bookings(data["uid"])
     else:
-        click.secho("You must sign in to view your confirmed bookings...", fg="", blink=True)
+        click.secho("You must sign in to view your confirmed bookings...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Workshop")
