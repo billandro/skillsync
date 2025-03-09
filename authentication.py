@@ -36,7 +36,7 @@ def login():
     email = click.prompt("Enter your email")
     password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
 
-    api_key = "AIzaSyDvWCvCBT37F2nttDjfddsAE3Wo-Sh4sd8"  # 🔹 Replace with your Firebase project's Web API Key
+    api_key = "AIzaSyDvWCvCBT37F2nttDjfddsAE3Wo-Sh4sd8"
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}"
     
     payload = {
@@ -50,9 +50,9 @@ def login():
         response_data = response.json()
 
         if "idToken" in response_data:
-            uid = response_data.get("localId")  # Extract the UID
+            uid = response_data.get("localId")
             click.secho(f"\nWelcome! You have successfully signed in.", bg="yellow", underline=True)
-            return response_data["idToken"], uid  # ✅ Return both the ID token and UID
+            return response_data["idToken"], uid
 
         else:
             click.secho(f"Error: {response_data.get('error', {}).get('message', 'Unknown error')}", fg="red", bold=True)
@@ -63,7 +63,6 @@ def login():
         return None, None
     
 
-# @cli.command()
 def sign_up():
     """Handles user sign-up"""
     click.secho("Signing up...", blink=True, fg="yellow")
