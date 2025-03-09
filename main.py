@@ -57,7 +57,7 @@ def view_workshops():
     from shared import list_workshops, list_mentors
 
     data = load_session("session.json")
-    if data["session"]:
+    if data["session"] and data["id_token"]:
         # Get 2D list for both mentors and peers
         mentors, peers = get_mentors_and_peers()
 
@@ -82,7 +82,7 @@ def request_session():
         user = auth.get_user(uid=user_uid)
         request_meeting(user.email)
     else:
-        click.secho("Please sign in to request a session...", fg="yellow", blink=True)
+        click.secho("You must sign in to request a session...", fg="yellow", blink=True)
 
 
 @main.command(name="View Bookings")
@@ -92,13 +92,12 @@ def view_bookings():
     This function requires user authentication and session creation.
     """
     from shared import view_user_confirmed_bookings
-    global session, user_uid
 
-    create_session()
-    if session is not None and user_uid is not None:
-        view_user_confirmed_bookings(user_uid)
+    data = load_session("session.json")
+    if data["session"] and data["id_token"]:
+        view_user_confirmed_bookings(data["uid"])
     else:
-        click.secho("Please sign in to view your bookings...", fg="yellow", blink=True)
+        click.secho("You must sign in to view your confirmed bookings...", fg="", blink=True)
 
 
 @main.command(name="Request Workshop")
