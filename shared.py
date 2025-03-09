@@ -1,5 +1,5 @@
 from firebase_admin import db, auth
-import click, string, random
+import click, string, random, json, os
 
 def read_from_database(path):
     ref = db.reference(path)
@@ -124,4 +124,17 @@ def view_user_confirmed_bookings(user_uid):
 
     except Exception as e:
         click.secho(f"{e}: Unfortunately, there are no scheduled meetings in the system.", fg="red")
-            
+
+
+def save_session(data, file):
+    """Save session details to a file"""
+    with open(file, "w") as f:
+        json.dump(data, f)
+
+
+def load_session(file):
+    """Load session details from a file"""
+    if os.path.exists(file):
+        with open(file, "r") as f:
+            return json.load(f)
+    return {"session": None, "id_token": None}
