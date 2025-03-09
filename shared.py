@@ -153,20 +153,20 @@ def list_peers(peers:list, current_user):
     available_peers = False
     try:
         for i in range(len(peers)):
-            key, mentor_data = peers[i]
+            peer_id, peer_data = peers[i]
 
-            if i == 0 and key != current_user:
+            if not available_peers and peer_id != current_user:
                 click.secho("Available peers:", fg="blue")
 
-            if mentor_data.get("role") == "mentor" and key != current_user:
+            if peer_data["role"] == "peer" and peer_id != current_user:
                 click.echo(f"\nPeer {i + 1}:")
-                click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
-                click.echo(f'Email: {mentor_data.get("email")}')
-                click.echo(f'Expertise: {mentor_data.get("expertise")}')
+                click.echo(f'Name: {peer_data["first_name"]}')
+                click.echo(f'Email: {peer_data["email"]}')
+                click.echo(f'Expertise: {peer_data["expertise"]}')
                 available_peers = True
         
         if not available_peers:
             click.secho(f"Unfortunately, there are no peers available...", fg="red", bg="white", blink=True)
 
-    except Exception as e:
-        click.secho(f"{e}: Unfortunately, there are no peers available...", fg="black", bg="white", blink=True)
+    except ValueError as e:
+        click.secho(f"{e}: Peers list is empty.", fg="black", bg="white", blink=True)
