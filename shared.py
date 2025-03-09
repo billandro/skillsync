@@ -135,6 +135,8 @@ def save_session(data, file):
 def load_session(file):
     """Load session details from a file"""
     if os.path.exists(file):
-        with open(file, "r") as f:
-            return json.load(f)
-    return {"session": None, "id_token": None}
+        if os.path.getsize(file) == 0:
+            return {"session": None, "id_token": None}
+        else:
+            with open(file, "r") as f:
+                return json.load(f)
