@@ -50,16 +50,17 @@ def login():
         response_data = response.json()
 
         if "idToken" in response_data:
+            uid = response_data.get("localId")  # Extract the UID
             click.secho(f"\nWelcome! You have successfully signed in.", bg="yellow", underline=True)
-            return response_data["idToken"]  # ✅ Return the valid ID token
+            return response_data["idToken"], uid  # ✅ Return both the ID token and UID
 
         else:
             click.secho(f"Error: {response_data.get('error', {}).get('message', 'Unknown error')}", fg="red", bold=True)
-            return None
+            return None, None
 
     except requests.RequestException as e:
         click.secho(f"Error while retrieving user from Firebase: {e}", fg="red")
-        return None
+        return None, None
     
 
 # @cli.command()
