@@ -24,18 +24,24 @@ def validate_not_empty(ctx, param, value):
 
 def list_mentors(mentors:list, current_user):
     """Ensures that there are mentors to begin with. If not an error message is displayed."""
+    available_mentors = False
     try:
         for i in range(len(mentors)):
-            if i == 0:
-                click.secho("Available mentors:", fg="blue")
-
             key, mentor_data = mentors[i]
 
-            if mentor_data.get("role") == "mentor" and key is not current_user:
+            if i == 0 and key != current_user:
+                click.secho("Available mentors:", fg="blue")
+
+            if mentor_data.get("role") == "mentor" and key != current_user:
                 click.echo(f"\nMentor {i + 1}:")
                 click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
                 click.echo(f'Email: {mentor_data.get("email")}')
                 click.echo(f'Expertise: {mentor_data.get("expertise")}')
+                available_mentors = True
+        
+        if not available_mentors:
+            click.secho(f"Unfortunately, there are no mentors available...", fg="red", bg="white", blink=True)
+
     except Exception as e:
         click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="black", bg="white", blink=True)
 
@@ -53,7 +59,7 @@ def list_workshops():
             click.echo(f"Topic {i + 1} - {v['topic']}")
             i += 1
     except Exception as e:
-        click.secho(f"{e}: You have no upcoming workshops...", fg="black", bg="white", blink=True)
+        click.secho(f"Unfortunately, there are no upcoming workshops...", fg="red", bg="white", blink=True)
 
 
 def request_workshop(topic:str, id:str, date_requested:str):
