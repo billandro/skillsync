@@ -37,14 +37,13 @@ def authenticate(ctx):
     returning_user = click.prompt("Are you a returning user?", type=click.Choice(["y", "n"], case_sensitive=True))
     
     if returning_user == "y":
-        ctx.obj["id_token"] = login()
+        ctx.obj["id_token"], ctx.obj["uid"] = login()
     else:
         ctx.obj["id_token"] = sign_up()
 
     create_session(ctx)
     save_session(ctx.obj, "session.json")
     click.secho("Session saved successfully!", fg="green")
-    click.echo(f"Context object after login: {ctx.obj}")
 
 
 @main.command(name="View Workshops")
@@ -56,18 +55,17 @@ def view_workshops():
     """
     from booking_system import get_mentors_and_peers
     from shared import list_workshops, list_mentors
-    global session, user_uid
 
-    create_session()
-    if session is not None and user_uid is not None:
+    data = load_session("session.json")
+    if data["session"]:
         # Get 2D list for both mentors and peers
         mentors, peers = get_mentors_and_peers()
 
         # List all available mentors and upcoming workshops from firebase
-        list_mentors(mentors)
+        list_mentors(mentors, data["uid"])
         list_workshops()
     else:
-        click.secho("Please sign in to view workshops...", fg="yellow", blink=True)
+        click.secho("You must sign in to view workshops and mentors...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Meeting")
