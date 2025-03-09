@@ -22,28 +22,28 @@ def validate_not_empty(ctx, param, value):
     return value
 
 
-def list_mentors(mentors:list, current_user):
-    """Ensures that there are mentors to begin with. If not an error message is displayed."""
-    available_mentors = False
+def list_peers(peers:list, current_user):
+    """Ensures that there are peers to begin with. If not an error message is displayed."""
+    available_peers = False
     try:
-        for i in range(len(mentors)):
-            key, mentor_data = mentors[i]
+        for i in range(len(peers)):
+            key, mentor_data = peers[i]
 
             if i == 0 and key != current_user:
-                click.secho("Available mentors:", fg="blue")
+                click.secho("Available peers:", fg="blue")
 
             if mentor_data.get("role") == "mentor" and key != current_user:
                 click.echo(f"\nMentor {i + 1}:")
                 click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
                 click.echo(f'Email: {mentor_data.get("email")}')
                 click.echo(f'Expertise: {mentor_data.get("expertise")}')
-                available_mentors = True
+                available_peers = True
         
-        if not available_mentors:
-            click.secho(f"Unfortunately, there are no mentors available...", fg="red", bg="white", blink=True)
+        if not available_peers:
+            click.secho(f"Unfortunately, there are no peers available...", fg="red", bg="white", blink=True)
 
     except Exception as e:
-        click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="black", bg="white", blink=True)
+        click.secho(f"{e}: Unfortunately, there are no peers available...", fg="black", bg="white", blink=True)
 
 
 def list_workshops():
@@ -146,3 +146,27 @@ def load_session(file):
         else:
             with open(file, "r") as f:
                 return json.load(f)
+            
+
+def list_peers(peers:list, current_user):
+    """Ensures that there are peers to begin with. If not an error message is displayed."""
+    available_peers = False
+    try:
+        for i in range(len(peers)):
+            key, mentor_data = peers[i]
+
+            if i == 0 and key != current_user:
+                click.secho("Available peers:", fg="blue")
+
+            if mentor_data.get("role") == "mentor" and key != current_user:
+                click.echo(f"\nPeer {i + 1}:")
+                click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
+                click.echo(f'Email: {mentor_data.get("email")}')
+                click.echo(f'Expertise: {mentor_data.get("expertise")}')
+                available_peers = True
+        
+        if not available_peers:
+            click.secho(f"Unfortunately, there are no peers available...", fg="red", bg="white", blink=True)
+
+    except Exception as e:
+        click.secho(f"{e}: Unfortunately, there are no peers available...", fg="black", bg="white", blink=True)
