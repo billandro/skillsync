@@ -112,7 +112,7 @@ def book_peer(peers, chosen_peers, user, done):
                     }
 
                     summary = f"This will be a one-on-one peer session. The session is on {peer_data['expertise']}."
-                    the_id = create_calender_event(user.email, peer_data["email"], summary, event_date, start_time, end_time)
+                    the_id = create_calender_event(user.uid, peer_data["email"], summary, event_date, start_time, end_time)
                     add_meeting_to_database(meeting_id, the_id)
 
             if not found:
@@ -128,6 +128,7 @@ def book_peer(peers, chosen_peers, user, done):
                 
         except Exception as e:
             click.secho(f"Unfortunately, there are no peers available. {e}", fg="red", bg="white", blink=True)
+            break
 
 
 def booking_date(the_date):
