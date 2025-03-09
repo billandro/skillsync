@@ -106,14 +106,13 @@ def request_a_workshop():
     This function requires user authentication and session creation.
     """
     from shared import request_workshop
-    global session, user_uid
 
-    create_session()
-    if session is not None and user_uid is not None:
+    data = load_session("session.json")
+    if data["session"] and data["id_token"]:
         topic = click.prompt("What topic would you like covered in this workshop?", type=str)
         date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
         
-        request_workshop(topic, user_uid, date_requested)
+        request_workshop(topic, data["uid"], date_requested)
     else:
         click.secho("Please sign in to request a workshop...", fg="yellow", blink=True)
 
