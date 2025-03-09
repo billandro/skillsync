@@ -129,7 +129,7 @@ def view_user_confirmed_bookings(user_uid):
             click.secho("You have no confirmed bookings.", fg="magenta", underline=True)
 
     except Exception as e:
-        click.secho(f"{e}: Unfortunately, there are no scheduled meetings in the system.", fg="red")
+        click.secho(f"You have no scheduled meetings in the system.", fg="red", underline=True)
 
 
 def save_session(data, file):
