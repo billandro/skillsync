@@ -22,7 +22,7 @@ def validate_not_empty(ctx, param, value):
     return value
 
 
-def list_mentors(mentors:list):
+def list_mentors(mentors:list, current_user):
     """Ensures that there are mentors to begin with. If not an error message is displayed."""
     try:
         for i in range(len(mentors)):
@@ -31,7 +31,7 @@ def list_mentors(mentors:list):
 
             key, mentor_data = mentors[i]
 
-            if mentor_data.get("role") == "mentor":
+            if mentor_data.get("role") == "mentor" and key is not current_user:
                 click.echo(f"\nMentor {i + 1}:")
                 click.echo(f'Name: {mentor_data.get("full_name") or mentor_data.get("first_name")}')
                 click.echo(f'Email: {mentor_data.get("email")}')
@@ -136,7 +136,7 @@ def load_session(file):
     """Load session details from a file"""
     if os.path.exists(file):
         if os.path.getsize(file) == 0:
-            return {"session": None, "id_token": None}
+            return {"session": None, "id_token": None, "uid": None}
         else:
             with open(file, "r") as f:
                 return json.load(f)
