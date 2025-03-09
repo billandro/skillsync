@@ -1,4 +1,4 @@
-import os.path, datetime, click
+import os.path, click
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -6,6 +6,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from firebase_admin import db, auth
+from datetime import datetime
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
@@ -33,6 +34,7 @@ def create_calender_event(email1, email2, summary, event_date, start_time, end_t
     user = auth.get_user_by_email(email1)
 
     service = build("calendar", "v3", credentials=creds)
+    event_date = datetime.strptime(event_date, "%Y-%m-%d")
 
     event = {
         'summary': summary,
@@ -48,7 +50,7 @@ def create_calender_event(email1, email2, summary, event_date, start_time, end_t
             'RRULE:FREQ=DAILY;COUNT=2'
         ],
         'attendees': [
-            {'email': user["email"]},
+            {'email': email1},
             {'email': email2}
         ],
         'reminders': {
@@ -63,4 +65,4 @@ def create_calender_event(email1, email2, summary, event_date, start_time, end_t
     event = service.events().insert(calendarId='primary', body=event).execute()
     click.echo(f"Event created: {event.get('htmlLink')}")
 
-    return event["id"]
+    return event.get("id")
