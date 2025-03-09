@@ -39,7 +39,7 @@ def authenticate(ctx):
     if returning_user == "y":
         ctx.obj["id_token"], ctx.obj["uid"] = login()
     else:
-        ctx.obj["id_token"] = sign_up()
+        ctx.obj["id_token"], ctx.obj["uid"] = sign_up()
 
     create_session(ctx)
     save_session(ctx.obj, "session.json")
@@ -79,7 +79,7 @@ def request_session():
     data = load_session("session.json")
     if data["session"] and data["uid"]:
         user = auth.get_user(uid=data["uid"])
-        request_meeting(user.get("email"))
+        request_meeting(user.email)
     else:
         click.secho("You must sign in to request a session...", fg="yellow", blink=True)
 
