@@ -47,7 +47,7 @@ def list_mentors(mentors:list, current_user_id):
 
 
 def list_workshops():
-    data = read_from_database("/Workshops Requests")
+    data = read_from_database("/Workshop Requests")
     i = 0
 
     try:
