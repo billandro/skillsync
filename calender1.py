@@ -31,7 +31,6 @@ def get_credentials():
 
 def create_calender_event(email1, email2, summary, event_date, start_time, end_time):
     creds = get_credentials()
-    user = auth.get_user_by_email(email1)
 
     service = build("calendar", "v3", credentials=creds)
     event_date = datetime.strptime(event_date, "%Y-%m-%d")
