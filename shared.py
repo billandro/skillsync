@@ -57,6 +57,7 @@ def list_workshops():
                 click.secho(f"\nUpcoming workshops:\n", fg="blue")
 
             click.echo(f"Topic {i + 1} - {v['topic']}")
+            click.echo(f"Requested date - {v['date_requested']}")
             i += 1
     except Exception as e:
         click.secho(f"\nUnfortunately, there are no upcoming workshops...", fg="red", bg="white", blink=True)
