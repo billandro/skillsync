@@ -124,7 +124,7 @@ def end_session(ctx):
     ctx.obj = load_session("session.json")
 
     if not ctx.obj.get("session"):
-        click.secho("You can't sign out if you were never signed in, silly.", fg="magenta")
+        click.secho("You can't sign out if you were never signed in, silly.", fg="yellow")
         return
 
     try:
