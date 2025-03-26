@@ -38,8 +38,10 @@ def authenticate(ctx):
     
     if returning_user == "y":
         ctx.obj["id_token"], ctx.obj["uid"] = login()
+        ctx.obj["session"] = ctx.obj["id_token"]
     else:
         ctx.obj["id_token"], ctx.obj["uid"] = sign_up()
+        ctx.obj["session"] = ctx.obj["id_token"]
 
     create_session(ctx)
     save_session(ctx.obj, "session.json")
@@ -47,72 +49,81 @@ def authenticate(ctx):
 
 
 @main.command(name="View Workshops")
-def view_workshops():
+@click.pass_context
+def view_workshops(ctx):
     """Lists upcoming workshops and mentors available for booking.
     
     This function requires user authentication and session creation.
     Local imports are used to break circular dependency.
     """
     from booking_system import get_mentors_and_peers
-    from shared import list_workshops, list_mentors
+    from shared import list_workshops, list_mentors, checkInvaliSession
 
-    data = load_session("session.json")
-    if data["session"] and data["id_token"]:
+    session, id_token, uid = checkInvaliSession(ctx)
+
+    if session and id_token:
         # Get 2D list for both mentors and peers
         mentors, peers = get_mentors_and_peers()
 
         # List all available mentors and upcoming workshops from firebase
-        list_mentors(mentors, data["uid"])
+        list_mentors(mentors, uid)
         list_workshops()
     else:
         click.secho("You must sign in to view workshops and mentors...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Meeting")
-def request_session():
+@click.pass_context
+def request_session(ctx):
     """Requests a meeting with a mentor.
     
     This function requires user authentication and session creation.
     """
     from booking_system import request_meeting
-    
-    data = load_session("session.json")
-    if data["session"] and data["uid"]:
-        user = auth.get_user(uid=data["uid"])
+    from shared import checkInvaliSession
+
+    session, id_token, uid = checkInvaliSession(ctx)
+    if session and uid:
+        user = auth.get_user(uid=uid)
         request_meeting(user.email)
     else:
         click.secho("You must sign in to request a session...", fg="yellow", blink=True)
 
 
 @main.command(name="View Bookings")
-def view_bookings():
+@click.pass_context
+def view_bookings(ctx):
     """Displays a list of confirmed bookings.
 
     This function requires user authentication and session creation.
     """
-    from shared import view_user_confirmed_bookings
+    from shared import view_user_confirmed_bookings, checkInvaliSession
 
-    data = load_session("session.json")
-    if data["session"] and data["id_token"]:
-        view_user_confirmed_bookings(data["uid"])
+    
+    session, id_token, uid = checkInvaliSession(ctx)
+
+    if session and id_token:
+        view_user_confirmed_bookings(uid)
     else:
         click.secho("You must sign in to view your confirmed bookings...", fg="yellow", blink=True)
 
 
 @main.command(name="Request Workshop")
-def request_a_workshop():
+@click.pass_context
+def request_a_workshop(ctx):
     """ Request a workshop from users
 
     This function requires user authentication and session creation.
     """
-    from shared import request_workshop
+    from shared import request_workshop, checkInvaliSession 
 
-    data = load_session("session.json")
-    if data["session"] and data["id_token"]:
+    session, id_token, uid = checkInvaliSession(ctx)
+
+    if session and id_token:
         topic = click.prompt("What topic would you like covered in this workshop?", type=str)
         date_requested = click.prompt("Enter a date for the workshop. Format 'year-month-day'", type=str)
         
-        request_workshop(topic, data["uid"], date_requested)
+        request_workshop(topic, uid, date_requested)
     else:
         click.secho("Please sign in to request a workshop...", fg="yellow", blink=True)
 
