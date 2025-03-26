@@ -53,13 +53,12 @@ def login():
             uid = response_data.get("localId")
             click.secho(f"\nWelcome! You have successfully signed in.", bg="yellow", underline=True)
             return response_data["idToken"], uid
-
         else:
             click.secho(f"Error: {response_data.get('error', {}).get('message', 'Unknown error')}", fg="red", bold=True)
             return None, None
 
     except requests.RequestException as e:
-        click.secho(f"Error while retrieving user from Firebase: {e}", fg="red")
+        click.secho(f"Error while retrieving user from Firebase", fg="red")
         return None, None
     
 

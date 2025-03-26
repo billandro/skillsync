@@ -1,2 +1,9 @@
 .env
+<<<<<<< HEAD
 .json
+=======
+credentials.json
+skillsync-project-451208-fc9c42873348.json
+token.json
+session.json
+>>>>>>> 456f2a822fbf1d388cbc8379bfa071195ef4db47

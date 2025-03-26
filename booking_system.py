@@ -165,3 +165,19 @@ def request_meeting(email):
     else:
         list_peers(peers, user.uid)
         book_peer(peers, chosen_peers, user, done)
+
+
+def cancel_meeting(user_id):
+    meetings = read_from_database("/Meetings")
+    
+    if not meetings:
+        click.secho("There are no meetings in the system.", fg="red")
+        return
+    
+    try:
+        for i in range(len(meetings)):
+            meeting_id, meeting_data = meetings[i]
+
+            
+    except Exception as e:
+        pass
