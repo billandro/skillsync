@@ -170,3 +170,19 @@ def list_peers(peers:list, current_user):
 
     except ValueError as e:
         click.secho(f"{e}: Peers list is empty.", fg="black", bg="white", blink=True)
+
+
+def checkInvaliSession(ctx):
+    the_session = load_session("session.json")
+    try:
+        valid = auth.verify_id_token(id_token=the_session["id_token"])
+        # click.secho(f"Valid: {json.load(valid)}")
+        return the_session["session"], the_session["id_token"], the_session["uid"]
+    except Exception as e:
+        # click.secho(f"You need to Sign in", fg="red")
+        save_session({"session": None, "uid": None, "id_token": None}, "session.json")
+        ctx.obj["session"] = None
+        ctx.obj["uid"] = None
+        ctx.obj["id_token"] = None
+        return ctx.obj["session"], ctx.obj["id_token"], ctx.obj["uid"]
+        
