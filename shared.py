@@ -192,4 +192,50 @@ def checkInvaliSession(ctx):
         ctx.obj["uid"] = None
         ctx.obj["id_token"] = None
         return ctx.obj["session"], ctx.obj["id_token"], ctx.obj["uid"]
+
+
+def list_meetings(user_id:str):
+    meetings = read_from_database("/Meetings")
+    
+    scheduled_meetings = False
+    try:
+        for i in range(len(meetings)):
+            meeting_id, meeting_data = meetings[i]
+            
+            if i == 0:
+                click.secho("Your scheduled meetings:", fg="blue")
+
+            if meeting_data.get("peer_id") == user_id or meeting_data.get("mentor_id") == user_id:
+                click.echo(f"\nMeeting {i + 1}:")
+                click.echo(f'Time: {meeting_data.get("time")}')
+                scheduled_meetings = True
+
+        if not meetings:
+            click.secho("There are no meetings in the system.", fg="red")
+            return scheduled_meetings
+
+        return scheduled_meetings
+            
+    except Exception as e:
+        click.secho(f"You have no scheduled meetings: {e}.")
+        return scheduled_meetings
         
+
+def find_the_peer_or_mentor(user_id:str):
+    users = read_from_database("/Users")
+
+    user_available = False
+    try:
+        for i in range(len(users)):
+            users_uid, user_data = users[i]
+
+            if users_uid == user_id:
+                user_available = True
+                return users_uid
+            
+        if not user_available:
+            click.secho("The user who you booked a meeting with was not found.", fg="red")
+            return
+
+    except Exception as e:
+        click.secho(f"No users available in the database. {e}", fg="red")
