@@ -160,11 +160,13 @@ def request_meeting(email):
     booking = click.prompt("Would you like to book a mentor or peer session?", type=click.Choice(["peer", "mentor"], case_sensitive=True)).strip()
 
     if booking == "mentor":
-        list_mentors(mentors, user.uid)
-        book_mentor(mentors, chosen_mentors, user, done)
+        successful = list_mentors(mentors, user.uid)
+        if successful:
+            book_mentor(mentors, chosen_mentors, user, done)
     else:
-        list_peers(peers, user.uid)
-        book_peer(peers, chosen_peers, user, done)
+        successful = list_peers(peers, user.uid)
+        if successful:
+            book_peer(peers, chosen_peers, user, done)
 
 
 def cancel_meeting(user_id):
