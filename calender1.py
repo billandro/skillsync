@@ -51,6 +51,10 @@ def get_credentials():
 
 # Function to create a calendar event
 def create_calendar_event(email1, email2, summary, event_date, start_time, end_time):
+    # Validate attendee emails
+    if not email1 or not email2 or "@" not in email1 or "@" not in email2:
+        raise ValueError("Invalid attendee email format. Please use valid email addresses.")
+
     # Build the Google Calendar service
     service = build("calendar", "v3", credentials=get_credentials())
 
@@ -72,8 +76,10 @@ def create_calendar_event(email1, email2, summary, event_date, start_time, end_t
         ],
     }
 
-    # Insert the event into the calendar
-    event_result = service.events().insert(calendarId="primary", body=event).execute()
-
-    # Return the event ID
-    return event_result["id"]
+    try:
+        # Insert the event into the calendar
+        event_result = service.events().insert(calendarId="primary", body=event).execute()
+        return event_result["id"]
+    except Exception as e:
+        print(f"Failed to create the event: {e}")
+        raise
