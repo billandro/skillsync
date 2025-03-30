@@ -31,7 +31,7 @@ def create_user_in_firebase(first_name:str, email:str, role:str, password:int, e
 
 def login():
     """Handles user login"""
-    click.secho("Logging in...", fg="yellow")
+    click.secho("Logging in...", fg="green")
 
     email = click.prompt("Enter your email")
     password = click.prompt("Enter your password", hide_input=True, confirmation_prompt=True)
