@@ -239,3 +239,36 @@ def find_the_peer_or_mentor(user_id:str):
 
     except Exception as e:
         click.secho(f"No users available in the database. {e}", fg="red")
+
+
+def list_meetings(user_id:str) -> bool:
+    meetings = read_from_database("/Meetings")
+    
+    scheduled_meetings = False
+    try:
+        for i in range(len(meetings)):
+            meeting_id, meeting_data = meetings[i]
+            
+            if i == 0:
+                click.secho("Your scheduled meetings:", fg="blue")
+
+            if meeting_data.get("peer_id") == user_id:
+                click.echo(f"\nMeeting {i + 1}:")
+                click.echo(f"You have a peer session with {find_the_peer_or_mentor(user_id)}.")
+                click.echo(f'Time: {meeting_data.get("time")}')
+                scheduled_meetings = True
+
+            if meeting_data.get("mentor_id") == user_id:
+                click.echo(f"\nMeeting {i + 1}:")
+                click.echo(f"You have a mentoring session with {find_the_peer_or_mentor(user_id)}.")
+                click.echo(f'Time: {meeting_data.get("time")}')
+                scheduled_meetings = True
+
+        if not meetings:
+            click.secho("You have no scheduled meetings.", fg="red")
+            return scheduled_meetings
+        return scheduled_meetings
+        
+    except Exception as e:
+        click.secho(f"There are no meetings in the system. {e}", fg="red")
+        return scheduled_meetings
