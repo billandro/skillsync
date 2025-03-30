@@ -1,6 +1,6 @@
 import datetime, click
 
-from calender1 import create_calender_event
+from calender1 import create_calendar_event
 from firebase_admin import auth
 from shared import read_from_database, add_meeting_to_database
 from shared import list_mentors, list_peers
@@ -58,7 +58,7 @@ def book_mentor(mentors, chosen_mentors, user, done):
                     }
 
                     summary = f"This will be a mentor session. The session is on {mentor_data['expertise']}."
-                    the_id = create_calender_event(user.email, mentor_data["email"], summary, event_date, start_time, end_time)
+                    the_id = create_calendar_event(user.email, mentor_data["email"], summary, event_date, start_time, end_time)
                     add_meeting_to_database(meeting_id, the_id)
 
             if not found:
@@ -110,9 +110,9 @@ def book_peer(peers, chosen_peers, user, done):
                         "time": f"{start_time}-{end_time}",
                         "status": "confirmed"
                     }
-
+                    
                     summary = f"This will be a one-on-one peer session. The session is on {peer_data['expertise']}."
-                    the_id = create_calender_event(user.uid, peer_data["email"], summary, event_date, start_time, end_time)
+                    the_id = create_calendar_event(user.email, peer_data["email"], summary, event_date, start_time, end_time)
                     add_meeting_to_database(meeting_id, the_id)
 
             if not found:
@@ -177,7 +177,7 @@ def cancel_meeting(user_id):
     try:
         for i in range(len(meetings)):
             meeting_id, meeting_data = meetings[i]
-
-            
+            print(meeting_data)
+            break
     except Exception as e:
         pass
