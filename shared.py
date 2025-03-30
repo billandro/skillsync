@@ -41,9 +41,11 @@ def list_mentors(mentors:list, current_user_id):
         
         if not available_mentors:
             click.secho(f"Unfortunately, there are no mentors available...", fg="red", bg="white", blink=True)
+            return available_mentors
 
     except Exception as e:
         click.secho(f"{e}: Unfortunately, there are no mentors available...", fg="black", bg="white", blink=True)
+        return available_mentors
 
 
 def list_workshops():
@@ -167,9 +169,11 @@ def list_peers(peers:list, current_user):
         
         if not available_peers:
             click.secho(f"Unfortunately, there are no peers available...", fg="red", bg="white", blink=True)
+            return available_peers
 
     except ValueError as e:
         click.secho(f"{e}: Peers list is empty.", fg="black", bg="white", blink=True)
+        return available_peers
 
 
 def checkInvaliSession(ctx):
