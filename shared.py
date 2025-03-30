@@ -95,35 +95,28 @@ def view_user_confirmed_bookings(user_uid):
         # Checks for confirmed meetings. For mentoring, being mentored, 
         # and peer sessions.
         for meeting_id, value in meetings_data.items():
-            if value["mentor_id"] == user_uid and value["status"] == "confirmed":
+            if value.get("mentor_id") == user_uid and value["status"] == "confirmed":
                 if i == 0:
-                    click.echo("Your confirmed bookings:")
+                    click.secho("Your confirmed bookings:", fg="blue")
 
-                click.echo(f"\nBooking {i + 1}:")
-                user = auth.get_user(value["mentee_id"])
-                click.echo(f"Mentoring session with {user.get('full_name') or user.get('first_name')}")
-                confirmed_booking = True
-                i += 1
-                continue
-
-            if  value["mentee_id"] == user_uid and value["status"] == "confirmed":
-                if i == 0:
-                    click.echo("Your confirmed bookings:")
-
-                click.echo(f"\nBooking {i + 1}:")
-                user = auth.get_user(value["mentor_id"])
-                click.echo(f"Mentor session with {user.get('full_name') or user.get('first_name')}")
+                click.echo(f"\nBooking {i + 1} -")
+                user = auth.get_user(value.get("peer_id"))
+                click.echo(f"Mentoring session with {user.display_name}")
+                click.echo(f"Time: {value['time']}")
+                click.echo(f"Email: {user.email}\n")
                 confirmed_booking = True
                 i += 1
                 continue
 
             if  value["peer_id"] == user_uid and value["status"] == "confirmed":
                 if i == 0:
-                    click.echo("Your confirmed bookings:")
+                    click.secho("Your confirmed bookings:", fg="blue")
 
-                click.echo(f"\nBooking {i + 1}:")
+                click.echo(f"\nBooking {i + 1} -")
                 user = auth.get_user(value["mentor_id"])
-                click.echo(f"Peer session with {user.get('full_name') or user.get('first_name')}")
+                click.echo(f"Peer session with {user.display_name}")
+                click.echo(f"Time: {value['time']}")
+                click.echo(f"Email: {user.email}\n")
                 confirmed_booking = True
                 i += 1
                 continue
