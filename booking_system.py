@@ -3,7 +3,7 @@ import datetime, click
 from calender1 import create_calendar_event
 from firebase_admin import auth
 from shared import read_from_database, add_meeting_to_database
-from shared import list_mentors, list_peers
+from shared import list_mentors, list_peers, list_meetings
 
 
 def get_mentors_and_peers():
@@ -170,16 +170,30 @@ def request_meeting(email):
 
 
 def cancel_meeting(user_id):
-    meetings = read_from_database("/Meetings")
-    
-    if not meetings:
-        click.secho("There are no meetings in the system.", fg="red")
-        return
-    
-    try:
-        for i in range(len(meetings)):
-            meeting_id, meeting_data = meetings[i]
-            print(meeting_data)
-            break
-    except Exception as e:
-        pass
+    scheduled_meetings = list_meetings(user_id)
+
+    if scheduled_meetings:
+        try:
+            meetings = read_from_database("/Meetings")
+        except Exception as e:
+            click.secho(f"Error reading meetings from database: {str(e)}", fg="red")
+            return
+        
+        cancelled_booking = click.prompt("Which scheduled meeting would you like to cancel? Enter the name of the individual (e.g. 'Bill')").strip().capitalize()
+
+        user_exists = False
+        for key, value in meetings.items():
+            if cancelled_booking == value.get("first_name"):
+                user_exists = True
+                delete_meeting_ref = meetings.child(key)
+                delete_meeting_ref.delete()
+                click.secho(f"Booking with {cancelled_booking} was successfully removed.", fg="green")
+                break
+
+        if not user_exists:
+            click.secho(
+                "Booking cancellation failed. Try again with the correct name or ensure the meeting exists.",
+                fg="yellow"
+            )
+        else:
+            click.secho("No scheduled meetings found for this user.", fg="blue")
