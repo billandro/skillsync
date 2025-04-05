@@ -214,48 +214,47 @@ def list_meetings(user_id:str):
         return scheduled_meetings
         
 
-def find_the_peer_or_mentor(user_id:str):
-    users = read_from_database("/Users")
+# def find_the_peer_or_mentor(user_id:str):
+#     users = read_from_database("/Users")
 
-    user_available = False
-    try:
-        for i in range(len(users)):
-            users_uid, user_data = users[i]
-
-            if users_uid == user_id:
-                user_available = True
-                return users_uid
+#     user_available = False
+#     try:
+#         for users_uid, user_data in users.items():
+#             if users_uid == user_id:
+#                 user_available = True
+#                 return user_data.get("peer_id")
             
-        if not user_available:
-            click.secho("The user who you booked a meeting with was not found.", fg="red")
-            return
+#         if not user_available:
+#             click.secho("The user who you booked a meeting with was not found in our system.", fg="red")
+#             return
 
-    except Exception as e:
-        click.secho(f"No users available in the database. {e}", fg="red")
+#     except Exception as e:
+#         click.secho(f"No users available in the database. {e}", fg="red")
 
 
 def list_meetings(user_id:str) -> bool:
     meetings = read_from_database("/Meetings")
     
     scheduled_meetings = False
+    i = 0
     try:
-        for i in range(len(meetings)):
-            meeting_id, meeting_data = meetings[i]
-            
+        for meeting_id, meeting_data in meetings.items():
             if i == 0:
                 click.secho("Your scheduled meetings:", fg="blue")
 
             if meeting_data.get("peer_id") == user_id:
                 click.echo(f"\nMeeting {i + 1}:")
-                click.echo(f"You have a peer session with {find_the_peer_or_mentor(user_id)}.")
+                click.echo(f"You have a peer session with {meeting_data.get('peer_id')}.")
                 click.echo(f'Time: {meeting_data.get("time")}')
                 scheduled_meetings = True
 
             if meeting_data.get("mentor_id") == user_id:
                 click.echo(f"\nMeeting {i + 1}:")
-                click.echo(f"You have a mentoring session with {find_the_peer_or_mentor(user_id)}.")
+                click.echo(f"You have a mentoring session with {meeting_data.get('mentor_id')}.")
                 click.echo(f'Time: {meeting_data.get("time")}')
                 scheduled_meetings = True
+
+            i += 1
 
         if not meetings:
             click.secho("You have no scheduled meetings.", fg="red")
@@ -263,5 +262,5 @@ def list_meetings(user_id:str) -> bool:
         return scheduled_meetings
         
     except Exception as e:
-        click.secho(f"There are no meetings in the system. {e}", fg="red")
+        click.secho(f"There are no meetings in the system.", fg="red")
         return scheduled_meetings
