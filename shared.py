@@ -195,7 +195,7 @@ def fetch_users_id(name:str) -> str:
         return
     
     for user_id, user_data in users.items():
-        if user_data["first_name"] == name:
+        if user_data["first_name"].lower() == name.lower():
             return user_id
 
 
