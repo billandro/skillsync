@@ -187,6 +187,18 @@ def checkInvaliSession(ctx):
         return ctx.obj["session"], ctx.obj["id_token"], ctx.obj["uid"]
 
 
+def fetch_users_id(name:str) -> str:
+    try:
+        users = read_from_database("/Users")
+    except Exception as e:
+        click.secho(f"Error reading users from database: {str(e)}", fg="red")
+        return
+    
+    for user_id, user_data in users.items():
+        if user_data["first_name"] == name:
+            return user_id
+
+
 def list_meetings(user_id:str):
     meetings = read_from_database("/Meetings")
     
