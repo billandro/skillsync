@@ -4,3 +4,5 @@ credentials.json
 skillsync-project-451208-fc9c42873348.json
 token.json
 session.json
+*.json
+skillsync-project-451208-firebase-adminsdk-fbsvc-9af6faf41b.json
